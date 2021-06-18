@@ -1,5 +1,5 @@
 # MulticalReader
-Console tool for reading archives from heat meter - Multical 601
+Console tool to read archives from heat meter "Multical 601"
 
 
 **USAGE:**
