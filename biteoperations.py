@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: koi8-r -*-
+#-*- coding: utf-8 -*-
 
 """
 Copyright (c) 2009, Artyom Breus <artyom.breus@gmail.com>
@@ -178,7 +178,6 @@ def Bytes2L(b, n, iPos):
     
     
 def Stuffing(bite):
-    """  ц╟ц▓ц▐ц≈ц┘ц▓ц▒ц┘ц■, ц■ц▓ц┘ц┌ц∙ц┘ц■ ц▄ц┴ ц┌ц│ц┼ц■ ц ц│ц█ц┘ц▌ц≥. ц╔ц⌠ц▄ц┴ ц└ц│, ц■ц▐ ц ц│ц█ц┘ц▌ц▒ц┘ц■ ц┘ц┤ц▐ ц┴ ц≈ц▐ц ц≈ц▓ц│ц²ц│ц┘ц■ True """    
     stuffing_done = False
     stuff_dict = {constants.SB_HdQ:constants.St_HdQ,
 		  constants.SB_HdR:constants.St_HdR,
@@ -187,13 +186,12 @@ def Stuffing(bite):
 		  constants.SB_Ack:constants.St_Ack}
     if stuff_dict.has_key(bite):
         stuffing_done = True
-        stuffing_bite = stuff_dict[bite] # ц╔ц⌠ц▄ц┴ ц┘ц⌠ц■ц≤ ц ц│ц█ц┘ц▌ц│ ц■ц▐ ц ц│ц█ц┘ц▌ц▒ц┘ц█
+        stuffing_bite = stuff_dict[bite]
     else:
 	stuffing_bite = bite 
     return stuffing_bite,stuffing_done
 
 def Destuffing(bite):
-    """  ц╟ц▓ц▐ц≈ц┘ц▓ц▒ц┘ц■, ц■ц▓ц┘ц┌ц∙ц┘ц■ ц▄ц┴ ц┌ц│ц┼ц■ ц ц│ц█ц┘ц▌ц≥. ц╔ц⌠ц▄ц┴ ц└ц│, ц■ц▐ ц ц│ц█ц┘ц▌ц▒ц┘ц■ ц┘ц┤ц▐ ц┴ ц≈ц▐ц ц≈ц▓ц│ц²ц│ц┘ц■ True """    
     destuffing_done = False
     destuff_dict = {constants.St_HdQ:constants.SB_HdQ,
 		    constants.St_HdR:constants.SB_HdR,
@@ -202,14 +200,14 @@ def Destuffing(bite):
 		    constants.St_Ack:constants.SB_Ack}
     if destuff_dict.has_key(bite):
         destuffing_done = True
-        destuffing_bite = destuff_dict[bite] # ц╔ц⌠ц▄ц┴ ц┘ц⌠ц■ц≤ ц ц│ц█ц┘ц▌ц│ ц■ц▐ ц ц│ц█ц┘ц▌ц▒ц┘ц█
+        destuffing_bite = destuff_dict[bite] 
     else:
 	destuffing_bite = bite 		 
     return destuffing_bite,destuffing_done
 
 
 def save_bite(bite):
-    # Записывает очередной байт в приёмный буфер. Нужна для предыдущей процедуры    
+    # п≈п╟п©п╦я│я▀п╡п╟п╣я┌ п╬я┤п╣я─п╣п╢п╫п╬п╧ п╠п╟п╧я┌ п╡ п©я─п╦я▒п╪п╫я▀п╧ п╠я┐я└п╣я─. п²я┐п╤п╫п╟ п╢п╩я▐ п©я─п╣п╢я▀п╢я┐я┴п╣п╧ п©я─п╬я├п╣п╢я┐я─я▀    
     if (constants.response_data_len >= constants.MaxRsp):
         constants.reading_status = constants.IP_Void
         constants.reading_error = constants.EP_TooMany
@@ -219,38 +217,38 @@ def save_bite(bite):
     return
 
 def proccess_bite(bite):
-    # Автомат приёма. Отсекает эхо, убирает стартовый и стоповый байтвы и т.д.
+    # п░п╡я┌п╬п╪п╟я┌ п©я─п╦я▒п╪п╟. п·я┌я│п╣п╨п╟п╣я┌ я█я┘п╬, я┐п╠п╦я─п╟п╣я┌ я│я┌п╟я─я┌п╬п╡я▀п╧ п╦ я│я┌п╬п©п╬п╡я▀п╧ п╠п╟п╧я┌п╡я▀ п╦ я┌.п╢.
     dbmsg(3,"reading_error = %s reading_status = %s"%( constants.reading_error_log[constants.reading_error],
 	    constants.reading_status_log[constants.reading_status]))
     if (constants.reading_status == constants.IP_Void):
 	    #print "1"
-	    # Прц┴бём не ожидается. Любой вход -- ошибка
+	    # п÷я─я├Б■╢п╠я▒п╪ п╫п╣ п╬п╤п╦п╢п╟п╣я┌я│я▐. п⌡я▌п╠п╬п╧ п╡я┘п╬п╢ -- п╬я┬п╦п╠п╨п╟
 	    if constants.reading_error != 0:	
 		constants.reading_error  = constants.EP_Raving
     elif (constants.reading_status == constants.IP_Wait):
     	    #print "2"
-	    # Жц└бём эха или собственно ответа.
+	    # п√я├Б■■п╠я▒п╪ я█я┘п╟ п╦п╩п╦ я│п╬п╠я│я┌п╡п╣п╫п╫п╬ п╬я┌п╡п╣я┌п╟.
 	    if (bite == constants.SB_HdQ):
-		# Начало эха с опто-головки
-        	constants.reading_status = constants.IP_Echo   # ц┘ц⌠ц▄ц┴ ц⌠ц■ц│ц▓ц■ц▐ц≈ц≥ц┼ ц┌ц┴ц■ 0x80 - ц■ц▐ ц√ц└бёц█ ц°ц┬ц│
+		# п²п╟я┤п╟п╩п╬ я█я┘п╟ я│ п╬п©я┌п╬-пЁп╬п╩п╬п╡п╨п╦
+        	constants.reading_status = constants.IP_Echo  
     	    elif (bite == constants.SB_HdR):
-		constants.reading_status = constants.IP_Resp   # ц┘ц⌠ц▄ц┴ 0x40 -  Начало ответа	    
+		constants.reading_status = constants.IP_Resp   # 0x40 -  п²п╟я┤п╟п╩п╬ п╬я┌п╡п╣я┌п╟	    
 		#print "detect 0x40 " 
             else:
 		constants.reading_status = constants.IP_Void
         	constants.reading_error = constants.EP_Violation         
     elif (constants.reading_status == constants.IP_Echo):
     	    #print "3"
-	    # Принимаем эхо. По стоп-байту прекращаем
+	    # п÷я─п╦п╫п╦п╪п╟п╣п╪ я█я┘п╬. п÷п╬ я│я┌п╬п©-п╠п╟п╧я┌я┐ п©я─п╣п╨я─п╟я┴п╟п╣п╪
 	    if (bite == constants.SB_End):
         	constants.reading_status = constants.IP_Paus
 	    else:		
-        	# В принципе, можно сравнивать с запросом
-        	# Но мы пока ничего не делаем
+        	# п▓ п©я─п╦п╫я├п╦п©п╣, п╪п╬п╤п╫п╬ я│я─п╟п╡п╫п╦п╡п╟я┌я▄ я│ п╥п╟п©я─п╬я│п╬п╪
+        	# п²п╬ п╪я▀ п©п╬п╨п╟ п╫п╦я┤п╣пЁп╬ п╫п╣ п╢п╣п╩п╟п╣п╪
 		pass
     elif (constants.reading_status == constants.IP_Paus):
     	    #print "4"
-    	    # Ждём ответа. Допустим только стартовый байт
+    	    # п√п╢я▒п╪ п╬я┌п╡п╣я┌п╟. п■п╬п©я┐я│я┌п╦п╪ я┌п╬п╩я▄п╨п╬ я│я┌п╟я─я┌п╬п╡я▀п╧ п╠п╟п╧я┌
     	    if (bite == constants.SB_HdR):
         	constants.reading_status = constants.IP_Resp
             elif (bite == constants.SB_Ack):
@@ -262,7 +260,7 @@ def proccess_bite(bite):
 		save_bite(bite)
     elif (constants.reading_status == constants.IP_Resp):
     	    #print "5"
-	    # Принимаем ответ
+	    # п÷я─п╦п╫п╦п╪п╟п╣п╪ п╬я┌п╡п╣я┌
     	    if (bite == constants.SB_End):
         	constants.reading_status = constants.IP_Void	# if bite == 0x0d
             elif (bite == constants.SB_Stf):
@@ -270,8 +268,7 @@ def proccess_bite(bite):
             else:
 		save_bite(bite)
     elif (constants.reading_status == constants.IP_Stuf):
-    	    #print "6"
-	    # Жц└бём байт замены
+	    # п√п╢я▒п╪ п╠п╟п╧я┌ п╥п╟п╪п╣п╫я▀
 	    bite,destuffing_done = Destuffing(bite)
     	    if destuffing_done:
         	constants.reading_status = constants.IP_Resp

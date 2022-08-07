@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: koi8-r -*-
+#-*- coding: utf8 -*-
 
 """
 Copyright (c) 2009, Artyom Breus <artyom.breus@gmail.com>
@@ -87,33 +87,31 @@ def empty_hour_arch(registr,datetime):
     return { 1003 : [datetime - timedelta(days = 1)]*24, 1002 :range(1,25) }.get(registr,[0]*24)
     #return { 1003 : [datetime]*24, 1002 :range(1,25) }.get(registr,[0]*24)
 
-def read_hour_arch(registr, date):
-    """óÞÉÔÁÔØ ÐÏËÁÚÁÎÉÅ ÞÅÇÏ-ÔÏ ÔÁÍ ÕËÁÚÁÎÎÏÇÏ × ÒÅÇÉÓÔÒÅ ÚÁ 24 ÞÁÓÁ """
+def read_hour_arch(registr, date):    
     records_amount = mantis_size = iPos = factor = b = 0       
     dbmsg(6,"REGISTR (%d)"%registr)    
     if registr in ( 1002 , 1003):
-	# ÅÓÌÉ ÄÁÔÁ ÉÌÉ ×ÒÅÍÑ ÔÏ ÚÁÐÏÌÎÑÅÍ ÓÏÏÔ×ÅÔÓÔ×ÅÎÏ, É ÎÁ ÓÞ£ÔÞÉË ÎÅ ÌÅÚÅÍ		
 	return empty_hour_arch( registr, date ) 
     res = [0] * 24
     #date = date + timedelta(hours = +1)
-    constants.Cmd.from_array([0x7f,0x63]) 					# ÎÏÍÅÒ ÆÕÎÃÉÉ × ËÏÍÍÁÎÄÕ
-    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)				# ÎÏÍÅÒ ÒÅÇÉÓÔÒÁ × ËÏÍÍÁÎÄÕ
-    constants.Cmd += [(date.year - 2000), (date.month), (date.day), 0x0 ]     	# ÚÁ ËÁËÕÀ ÄÁÔÕ ÓÞÉÁÔØ × ËÏÍÍÁÎÄÕ
-    constants.reading_error = SendCommand(constants.Cmd, 8)			# ÚÁÓÌÁÔØ É ÓÌÕÛÁÔØ ÏÔ×ÅÔ
+    constants.Cmd.from_array([0x7f,0x63]) 					
+    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)				
+    constants.Cmd += [(date.year - 2000), (date.month), (date.day), 0x0 ]     	
+    constants.reading_error = SendCommand(constants.Cmd, 8)			
     if constants.reading_error != 0:
 	print "Detected some errors during reading process - try again"
         return False
     #dbmsg(6," >>> response (%s)"%lst2hx(response))
-    mantis_size = constants.response[5]               	# ������ ��������
-    factor = Byte2Factor(constants.response[6])  		# ������
+    mantis_size = constants.response[5]               	# Размер мантиссы
+    factor = Byte2Factor(constants.response[6])  		# Фактор
     print "response_data_len = ",constants.response_data_len
-    records_amount = (constants.response_data_len - 8) / mantis_size   # ���������� ��Þޣ��� ���������� (24)
+    records_amount = (constants.response_data_len - 8) / mantis_size   # Количество отчётов полученное (24)
     #sys.exit(1)
     if records_amount <= 0:
         reading_error = 99
         print "Error reading hour arch NO records"
         return res
-    iPos = 8				# ÇÄÅ ÎÁÞÉÎÁÀÔÓÑ ÓÏÂÓÔ×ÅÎÎÏ ÄÁÎÎÙÅ 
+    iPos = 8				
     if records_amount > 24:
 	   records_amount = 24
     tmp = 0
@@ -122,7 +120,7 @@ def read_hour_arch(registr, date):
 	#print "---<> resp = %s, mantis=%d, ipos=%d	"%(lst2hx(constants.response), mantis_size, iPos)
         tmp = Byte2Mantiss(constants.response, mantis_size, iPos)		# 1234
 	res[j] = tmp * factor					# 1234 * 0.01 = 12.34
-        iPos = iPos + mantis_size				# ÓÍÅÝÅÎÉÅ
+        iPos = iPos + mantis_size				
         #dbmsg(6,"res[%d] = %2f "%(j,res[j]))        
         #print "+++	" , repr(res)
     res.reverse()
@@ -142,8 +140,8 @@ def read_day_arch(registr, from_date, days_amount, day ):
     records_amount = mantis_size = iPos = factor = 0            
     data = [0] * days_amount
     #print "here"
-    constants.Cmd.from_array([0x3f,0x66]) 					# ÎÏÍÅÒ ÆÕÎÃÉÉ × ËÏÍÍÁÎÄÕ
-    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)				# ÎÏÍÅÒ ÒÅÇÉÓÔÒÁ × ËÏÍÍÁÎÄÕ        
+    constants.Cmd.from_array([0x3f,0x66]) 				
+    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)			
     f_date = from_date
     day = 0       
     while day < days_amount:
@@ -153,15 +151,15 @@ def read_day_arch(registr, from_date, days_amount, day ):
 		dbmsg(5,"some errors")
     		return data
     	try:
-    	    mantis_size = constants.response[5]               			# ������ ��������    	    
+    	    mantis_size = constants.response[5]               			# Размер мантиссы    	    
     	except IndexError:
-    	    print "response[5]=" , constants.response             			# ������ ��������    	    
+    	    print "response[5]=" , constants.response             			# Размер мантиссы    	    
     	    break
     	print 'mantis_size = ', mantis_size
     	if mantis_size == 0:
     	    break
-	factor = Byte2Factor(constants.response[6]) 		 		# ������
-        records_amount = (constants.response_data_len - 7) / mantis_size   	# ���������� ��Þޣ��� ����������
+	factor = Byte2Factor(constants.response[6]) 		 		# Фактор
+        records_amount = (constants.response_data_len - 7) / mantis_size   	# Количество отц·чётов полученное
         if records_amount == 0:
     	    return data    	
     	iPos = 7
@@ -193,22 +191,22 @@ def read_month_arch(registr, from_date, months_amount, month ):
     #if not registr == 1003:	
     #	data = empty_day_arch(registr,from_date, months_amount, month)    
     #	print repr(data)
-    constants.Cmd.from_array([0x3f,0x65]) 					# ÎÏÍÅÒ ÆÕÎÃÉÉ × ËÏÍÍÁÎÄÕ
-    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)				# ÎÏÍÅÒ ÒÅÇÉÓÔÒÁ × ËÏÍÍÁÎÄÕ
+    constants.Cmd.from_array([0x3f,0x65]) 				
+    constants.Cmd = I2Bytes(registr, constants.Cmd, 2)			
     f_date = from_date
     month = 0
     while month < months_amount:
-	constants.Cmd = I2Bytes(f_date, constants.Cmd, 4)		# ÎÏÍÅÒ ÒÅÇÉÓÔÒÁ × ËÏÍÍÁÎÄÕ
+	constants.Cmd = I2Bytes(f_date, constants.Cmd, 4)		
 	constants.reading_error = SendCommand(constants.Cmd, 6)
 	if constants.reading_error != 0:
 		dbmsg(5,"some errors")
     		return [0] * months_amount
     	try:
-    	    mantis_size = constants.response[5]               			# ������ ��������
-	    factor = Byte2Factor(constants.response[6]) 			 	# ������
+    	    mantis_size = constants.response[5]               			# Размер мантиссы
+	    factor = Byte2Factor(constants.response[6]) 			 	# Фактор
 	except IndexError:
 	    return [0] * months_amount	    
-        records_amount = (constants.response_data_len - 7) / mantis_size   	# ���������� ��Þޣ��� ����������
+        records_amount = (constants.response_data_len - 7) / mantis_size   	# Количество отц·чётов полученное
         if records_amount == 0:
     	    return [0] * months_amount
         iPos = 7

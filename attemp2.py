@@ -421,9 +421,7 @@ class main3(wx.Frame):
 	self.end_date   = None	
 	self.reg_list	= None
 	self.data = None
-        self._init_ctrls(parent)
-
-        
+        self._init_ctrls(parent) 
         
         
         

@@ -59,11 +59,8 @@ def read_number():
 
 def month_archive(reg_list, fromdate, todate):
     
-    # ÔÁË ËÁË ×ÒÅÍÑ ÐÒÉ ÓÎÑÔÉÉ ÁÒÈÉ×Á ÉÄ£Ô ÏÔ ÓÅÇÏÄÎÑ É × ÇÌÕÂØ ×ÅËÏ× - ÍÅÎÑÅÍ ÍÅÓÔÁÍÉ to_date & from_date
-    
     from_date = todate 
     to_date   = fromdate
-    
     
     month_now = datetime(*ddate.today().timetuple()[:3])
     f_date = months_left( month_now, from_date ) 
@@ -93,8 +90,7 @@ def month_archive(reg_list, fromdate, todate):
     return constants.table
     
 def day_archive(reg_list, fromdate, todate):
-    # ÔÁË ËÁË ×ÒÅÍÑ ÐÒÉ ÓÎÑÔÉÉ ÁÒÈÉ×Á ÉÄ£Ô ÏÔ ÓÅÇÏÄÎÑ É × ÇÌÕÂØ ×ÅËÏ× - ÍÅÎÑÅÍ ÍÅÓÔÁÍÉ to_date & from_date
-    
+
     from_date = todate 				# 12 november
     to_date = fromdate 				# 01 august
     
@@ -104,7 +100,7 @@ def day_archive(reg_list, fromdate, todate):
     start_date = days_left(now_day,from_date)
     #print "now_day = %s,	from_date = %s"%(repr(now_day),repr(from_date))
     #print "from_day = %s,	to_date = %s"%(repr(from_date),repr(to_date))
-    archive_records = days_left(from_date,to_date) + 1 # c 12.11 ÐÏ 01.08 Ë ÐÒÉÍÅÒÕ		
+    archive_records = days_left(from_date,to_date) + 1 
     #print "startdate %d, records =%d"%(start_date, archive_records)
     len_reglist = len_reglist2 = len(reg_list)
     for reg in reg_list:               

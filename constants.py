@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: koi8-r -*-
+#-*- coding: utf-8 -*-
 
 """
 Copyright (c) 2009, Artyom Breus <artyom.breus@gmail.com>
@@ -23,14 +23,14 @@ from datetime import datetime
 #CONSTANTS ERRORS
 
 reading_error = 0
-EP_None = 0        # �ӣ ��
-EP_Line = 1        # ������ �� ����� �����
-EP_TimeOut = 2     # ��� ������ (�������)
-EP_Raving = 3      # ������������� �����
-EP_Violation = 4   # ��������� ���������
-EP_Stuff = 5       # ������������ ������
-EP_CRC = 6         # ������ CRC
-EP_TooMany = 7     # ������� ����� ������ 
+EP_None = 0        # Всё ОК
+EP_Line = 1        # Ошибки на линии связи
+EP_TimeOut = 2     # Нет ответа (таймаут)
+EP_Raving = 3      # Незапрошенный обмен
+EP_Violation = 4   # Нарушение протокола
+EP_Stuff = 5       # Неправильная замена
+EP_CRC = 6         # Ошибка CRC
+EP_TooMany = 7     # Слишком много данных 
 
 reading_error_log = { \
     EP_None 	:'EP_None',
@@ -43,13 +43,13 @@ reading_error_log = { \
     EP_TooMany  :'EP_TooMany '}
 
 #CONSTANTS STATUS
-reading_status = 0   #  ��������� �������� ��ɣ�� (default = 0 = IP_Void)
-IP_Void = 0   #  ��É£� ��������
-IP_Wait = 1   #  öÄ£Í  ��Á
-IP_Echo = 2   #  ��É£� ���
-IP_Paus = 3   #  öÄ£Í  ������
-IP_Resp = 4   #  ��É£� ������
-IP_Stuf = 5   #  öÄ£Í  ������              
+reading_status = 0   #  Состояние автомата приёма (default = 0 = IP_Void)
+IP_Void = 0   #  Приём выключен
+IP_Wait = 1   #  Приём эха
+IP_Echo = 2   #  Приём эха
+IP_Paus = 3   #  Приём ответа
+IP_Resp = 4   #  Приём ответа
+IP_Stuf = 5   #  Приём замены
 
 reading_status_log = { \
     IP_Void : 'IP_Void',
@@ -61,16 +61,16 @@ reading_status_log = { \
 
 
 # Bites for request
-SB_HdQ = 0x80;St_HdQ = 0x7F  # �����-���� �������
-SB_HdR = 0x40;St_HdR = 0xBF  # �����-���� ������
-SB_End = 0x0D;St_End = 0xF2  # ����-����
-SB_Stf = 0x1B;St_Stf = 0xE4  # ���� �������� ������
-SB_Ack = 0x06;St_Ack = 0xF9  # ������������
+SB_HdQ = 0x80;St_HdQ = 0x7F  # Старт-байт запроса
+SB_HdR = 0x40;St_HdR = 0xBF  # Старт-байт ответа
+SB_End = 0x0D;St_End = 0xF2  # Стоп-байт
+SB_Stf = 0x1B;St_Stf = 0xE4  # Байт префикса замены
+SB_Ack = 0x06;St_Ack = 0xF9  # Подтверждени
 
 
 #class
 class BiteSequences(list):
-    """îÅÍÎÏÖËÏ ÍÏÄÅÒÎÅÚÉÒÏ×ÁÎÎÙÊ ÓÐÉÓÏË"""
+
     def __init__(self,array=None):
 	if array:
 	    if isinstance(array,list):		
@@ -78,28 +78,27 @@ class BiteSequences(list):
 		self.from_array(array)
 	    elif isinstance(array,str):		
 		self.from_str(array)
+
     def as_array(self):
-	"""×Ù×ÅÓÔÉ ÍÁÓÓÉ× ÂÁÊÔ ËÁË ÓÐÉÓÏË"""
 	return self
+
     def as_str(self):
-	"""×Ù×ÅÓÔÉ ÍÁÓÓÉ× ÂÁÊÔ ËÁË ÓÔÒÏËÕ"""
 	return "".join([chr(x) for x in self])
+
     def from_str(self,string=""):
-	"""ÐÏÌÕÞÅÎÎÕÀ ÐÏÓÌÅÄÏ×ÁÔÅÌØÎÏÓÔØ ÂÁÊÔ ÐÅÒÅ×ÅÓÔÉ × ÓÐÉÓÏË"""
-	
-	"""if string.__len__()<15:
-	    string += "\x00"*(15 - string.__len__())"""
 	self.clear_array()
 	self += list([ord(x) for x in string])
+
     def from_array(self,array=[]):
-	"""if array.__len__()<15:
-	    array += [0]*(15 - array.__len__())"""
 	self.clear_array()
 	self += array
+
     def clear_array(self):
 	self = self.__delslice__(0,self.__len__())
+
     def __getslice__(self,i,j):
         return BiteSequences(list(self)[i:j])
+
     def __add__(self,y):
         return BiteSequences(list(self) + y)    
 
@@ -108,25 +107,23 @@ class BiteSequences(list):
 #GLOBAL VARIABLES
 port = None      
 MaxRsp   	  = 1023
-Rqs 	 	  = BiteSequences() # úÁÐÒÏÓ ÞÅÇÏ-ÌÉÂÏ
-Cmd 	 	  = BiteSequences() # ëÏÍÍÁÎÄÁ ÏÔ ÚÁÐÒÏÓÁ
-request  	  = BiteSequences() # ÐÏÌÎÏÓÔØÀ ÓÆÏÒÍÉÒÏ×ÁÎÎÙÊ ÚÁÐÒÏÓ = ÓÐÅÃ.ÂÉÔÙ + Cmd
-request_data_len  = 0 		    # ÄÌÉÎÁ ÚÁÐÒÏÓ × ÂÁÊÔÁÈ
-response 	  = BiteSequences() # ÏÎ ÖÅ MC601Response
-response_data_len = 0 		    # ÄÌÉÎÁ ÏÔ×ÅÔÁ × ÂÁÊÔÁÈ
+Rqs 	 	  = BiteSequences() 
+Cmd 	 	  = BiteSequences() 
+request  	  = BiteSequences() 
+request_data_len  = 0 		    
+response 	  = BiteSequences() 
+response_data_len = 0 		    
 register = 0
-data = []		    	    # ÕÖÅ ÏÂÒÁÂÏÔÁÎÎÙÊ ÄÁÎÎÙÅ, ÇÏÔÏ×ÙÅ ÄÌÑ ÚÁÐÉÓÉ
-table = {}			    # ÄÁÎÎÙÅ × ÓÌÏ×ÁÒÅ Ó ÒÅÇÉÓÒÏÍ × ËÁÞÅÔ×Å ËÌÀÞÁ
+data = []		    	    
+table = {}			    
 
-#---------- timing -------------	# ÔÁÊÍÅÒ ÐÒÉ£ÍÁ
+#---------- timing -------------
 end_time = datetime.now()
 wait = False
-#--------- Status -------------- 	# ÓÔÁÔÕÓ ÐÒÉ£ÍÁ
+#--------- Status -------------- 
 active = False
-connection_error = [ "ðÏÒÔ ÏÔËÒÙÔ", "îÅ×ÅÒÎÙÊ ÎÏÍÅÒ ÐÏÒÔÁ","ïÛÉÂËÁ ÍÏÄÕÌÑ MSComm32",
-		     "ðÏÒÔ ÏÔËÒÙÔØ ÎÅ ÕÄÁÌÏÓØ","îÅ ÕÄÁÌÏÓØ ÏÂÎÁÒÕÖÉÔØ óÞ£ÔÞÉË"] 
+connection_error = [ "Error 1", "Error 2","MSComm32 Error","Error 4"] 
 
-#---------headmeter-------		# ÄÁÎÎÙÅ ÔÅÐÌÏÓÞ£ÔÞÉËÁ
+#---------headmeter-------	
 date_time = datetime.now()
 heatmeter_number = 0
-

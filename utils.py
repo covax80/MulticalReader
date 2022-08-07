@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: koi8-r -*-
+#-*- coding: utf8 -*-
 
 """
 Copyright (c) 2009, Artyom Breus <artyom.breus@gmail.com>

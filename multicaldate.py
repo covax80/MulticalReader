@@ -34,13 +34,10 @@ def mult2python_date(mult_date,return_datetime = False):
     year_month 	= mult_date / 100
     day		= mult_date % 100
     if day != 0:
-	# ÐÏÌÎÙÅ ÄÁÔÙ
 	return dt(2000 + year_month / 100, year_month % 100, day)
     elif (year_month % 100) != 0:
-	#ÍÅÓÑÃÙ É ÇÏÄÙ
 	return dt(2000 + year_month / 100,  year_month % 100, 1)	
     else:
-	#ÔÏÌØËÏ ÇÏÄÙ
 	return dt(2000 + year_month / 100,  1, 1)
 	
     
@@ -102,8 +99,6 @@ def DateDiff(first_date,second_date):
     return days_left(mult2python_date(first_date),mult2python_date(second_date))
     
 
-if __name__ == '__main__':
-    pass
 
 
     
